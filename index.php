@@ -1,11 +1,52 @@
 <?php
+session_start();
+include 'admin/config.php';
+include 'admin/core_fighting.php';
+include 'admin/core_functions.php';
+include RESOURCES . TEMPLATES . 'header.php';
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["player_code"])) {
+    $data = array();
+    $errors = array();
+    $id = $_POST['player_code'];
+
+    $sql = "SELECT * FROM player WHERE `code` = '".$id."';";
+    $result = SelectSQL($sql, $conn);
+
+    if ($row = $result) {
+        $ajaxGold = $row['gold'];
+        $_SESSION['code'] = $row['code'];
+        $data['success'] = true;
+    } else {
+        $data['success'] = false;
+    }
+
+    $data['id'] = $_SESSION['code'];
+
+    echo json_encode($data);
+    exit(0);
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $data = array();
     $errors = array();
     $id = $_POST['id'];
 
+    $ajaxGold = 3;
+
+    $sql = "SELECT * FROM player";
+    $result = SelectSQL($sql, $conn);
+
+    if ($row = $result) {
+        $ajaxGold = $row['gold'];
+    }
+
+    $ajaxGold++;
+
+    $sql = "UPDATE `player` SET `gold`= ".$ajaxGold.";";
+    $result = UpdateSQL($sql, $conn);
+
     $data['success'] = true;
-    $data['id'] = $id;
+    $data['gold'] = $ajaxGold;
 
     echo json_encode($data);
     exit(0);
@@ -26,14 +67,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script type="text/javascript" src="/resources/js/functions.js"></script>
 </head>
 <?php
-include 'admin/config.php';
-include RESOURCES . TEMPLATES . 'header.php';
+
+echo "<form method=\"POST\" id='player_login' enctype=\"multipart/form-data\">
+<input type='text' name='player_code'><br>
+<input type='submit' class='submit' name='player_submit'>
+</form>";
 
 $sql = "SELECT * FROM player;";
 $result = SelectSQL($sql, $conn);
+$gold = 0;
 if ($row = $result) {
     echo "Mysql connection success!\n" .  $row['name'];
+    $gold = $row['gold'];
 }
+echo "<div class='gold'>".$gold."</div>";
 echo "<div class='fight_button' id='fight_button'>Click Me!</div>";
 ?>
 
