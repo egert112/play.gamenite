@@ -31,9 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = array();
     $id = $_POST['id'];
 
-    $ajaxGold = 3;
+    $ajaxGold = 0;
 
-    $sql = "SELECT * FROM player";
+    $sql = "SELECT * FROM player WHERE `code` = '".$_SESSION['code']."';";
     $result = SelectSQL($sql, $conn);
 
     if ($row = $result) {
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $ajaxGold++;
 
-    $sql = "UPDATE `player` SET `gold`= ".$ajaxGold.";";
+    $sql = "UPDATE `player` SET `gold`= ".$ajaxGold." WHERE `code` = '".$_SESSION['code']."';";
     $result = UpdateSQL($sql, $conn);
 
     $data['success'] = true;
@@ -67,22 +67,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script type="text/javascript" src="/resources/js/functions.js"></script>
 </head>
 <?php
-
-echo "<form method=\"POST\" id='player_login' enctype=\"multipart/form-data\">
+if (isset($_SESSION['code'])) {
+    $sql = "SELECT * FROM player WHERE `code` = '".$_SESSION['code']."';";
+    $result = SelectSQL($sql, $conn);
+    $gold = null;
+    if ($row = $result) {
+        echo "Mysql connection success!\n" .  $row['name'];
+        $gold = $row['gold'];
+    }
+    echo "<div class='gold'>".$gold."</div>";
+    echo "<div class='fight_button' id='fight_button'>Click Me!</div>";
+    echo "
+    <a href=\"logout.php\">Logout</a>
+    ";
+} else {
+    echo "<form method=\"POST\" id='player_login' enctype=\"multipart/form-data\">
 <input type='text' name='player_code'><br>
 <input type='submit' class='submit' name='player_submit'>
 </form>";
 
-$sql = "SELECT * FROM player;";
-$result = SelectSQL($sql, $conn);
-$gold = 0;
-if ($row = $result) {
-    echo "Mysql connection success!\n" .  $row['name'];
-    $gold = $row['gold'];
 }
-echo "<div class='gold'>".$gold."</div>";
-echo "<div class='fight_button' id='fight_button'>Click Me!</div>";
-?>
 
+?>
+<br>
+Test accounts:<br>
+(Nimi) - (Code)<br>
+Kurmo - cHXE1EwowXdnGYWzoaZRTFP4jc5E9GPmnM0orxMXu0lbYhLnsK<br>
+Daisy - PkvBAoD8emvfQSnGk2fTndP6X4YkyD9nXEYy3BGhYcxO4VupXJ<br>
+Egert - 2Hzh8A83cDLgavkKExOE1FFvaeJWHhuJY317E9aQNW6XrqH5Yw<br>
 </body>
 </html>

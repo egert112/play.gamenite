@@ -40,8 +40,7 @@ jQuery(function($) {
                 if (!data.success) {
                     console.log(data);
                 } else {
-                    console.log(data);
-                    return false;
+                    location.reload();
                 }
             })
             .fail(function(data) {
